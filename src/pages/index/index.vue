@@ -10,11 +10,16 @@
         indicator-active-color="#EA4350"
         autoplay
         current="0"
-        interval="1000"
+        interval="3000"
         circular
       >
         <swiper-item class="banner-img banner-items" v-for="item in carousel" :key="item.goods_id">
-          <navigator :open-type="item.open_type" :url="item.navigator_url">
+          <navigator
+            :open-type="item.open_type"
+            :url="item.navigator_url"
+            @tap="handleTapOnBanner(item.navigator_url)"
+            animationType="pop-in"
+          >
             <image class="banner-img" mode="widthFix" :src="item.image_src" />
           </navigator>
         </swiper-item>
@@ -27,12 +32,13 @@
         :key="item.name"
         :open-type="item.open_type"
         :url="item.navigator_url"
+        @tap="handleTapOnCategory(item.navigator_url)"
       >
         <image class="icons" :src="item.image_src" />
       </navigator>
     </view>
     <!-- 时尚女装 -->
-    <view class="adv" v-for="item in floorList" :key="item.name">
+    <view class="adv" v-for="(item,index) in floorList" :key="item.name">
       <view class="adv-title">
         <image mode="widthFix" :src="item.floor_title.image_src" />
       </view>
@@ -42,6 +48,7 @@
             class="left-nav"
             :open-type="item.product_list[0].open_type"
             :url="item.product_list[0].navigator_url"
+            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
           >
             <image
               mode="heightFix"
@@ -56,6 +63,7 @@
             class="adv-nav"
             :open-type="item.product_list[1].open_type"
             :url="item.product_list[1].navigator_url"
+            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[1].image_src" />
           </navigator>
@@ -63,6 +71,7 @@
             class="adv-nav"
             :open-type="item.product_list[2].open_type"
             :url="item.product_list[2].navigator_url"
+            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[2].image_src" />
           </navigator>
@@ -70,6 +79,7 @@
             class="adv-nav"
             :open-type="item.product_list[3].open_type"
             :url="item.product_list[3].navigator_url"
+            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[3].image_src" />
           </navigator>
@@ -77,6 +87,7 @@
             class="adv-nav"
             :open-type="item.product_list[4].open_type"
             :url="item.product_list[4].navigator_url"
+            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[4].image_src" />
           </navigator>
@@ -137,10 +148,28 @@ export default {
         url: "https://api-hmugo-web.itheima.net/api/public/v1/home/floordata",
         success: (res) => {
           this.floorList = res.data.message;
-          console.log(res.data.message);
-          //   //取出数组
-          //   this.floorContent = res.data.message.map((v) => v.product_list);
         },
+      });
+    },
+    //点击轮播图
+    handleTapOnBanner(url) {
+      uni.navigateTo({
+        url: url,
+      });
+    },
+    //点击分类
+    handleTapOnCategory(url) {
+      console.log(url);
+      uni.navigateTo({
+        url: url,
+      });
+    },
+    handleTapOnFloor(url) {
+      console.log(url);
+      url = url.replace("/pages/goods_list", "/pages/goods_list/index");
+      console.log(url);
+      uni.navigateTo({
+        url: url,
       });
     },
   },

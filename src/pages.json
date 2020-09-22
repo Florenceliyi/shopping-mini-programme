@@ -13,6 +13,12 @@
 			}
 		},
 		{
+			"path": "pages/category/main",
+			"style": {
+				"navigationBarTitleText": "main"
+			}
+		},
+		{
 			"path": "pages/goods_list/index",
 			"style": {
 				"navigationBarTitleText": "商品列表"
@@ -22,6 +28,12 @@
 			"path": "pages/goods_detail/index",
 			"style": {
 				"navigationBarTitleText": "商品详情"
+			}
+		},
+		{
+			"path": "pages/goods_detail/main",
+			"style": {
+				"navigationBarTitleText": "main"
 			}
 		},
 		{
@@ -78,7 +90,6 @@
 				"navigationBarTitleText": "支付"
 			}
 		}
-
 	],
 	"tabBar": {
 		"color": "#000000",
@@ -92,8 +103,8 @@
 			},
 			{
 				"pagePath": "pages/category/index",
-				"iconPath": "static/user.png",
-				"selectedIconPath": "static/user_selected.png",
+				"iconPath": "static/category.png",
+				"selectedIconPath": "static/category_selected.png",
 				"text": "分类"
 			},
 			{
