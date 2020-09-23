@@ -15,7 +15,7 @@
         <view class="category-content" v-for="item in cateRight" :key="item.cat_id">
             <view class="content-title">/ {{item.cat_name}} /</view>
             <view class="goods">
-                <navigator class="navigator" v-for="arr in item.children" :key="arr.cat_id">
+                <navigator :url="'/pages/goods_list/index?cid='+arr.cat_id+'&pagenum=1&pagesize=6'" class="navigator" v-for="arr in item.children" :key="arr.cat_id" >
                     <image class="img" mode="heightFix" :src="arr.cat_icon" ></image>
                     <view class="des">{{arr.cat_name}}</view>
                 </navigator>
@@ -56,10 +56,10 @@ export default {
                     this.renderContentPage(index);
                 }   
                     const cateAllList = cates.data;
-                    console.log(cateAllList);
-                    this.cateLeft = cateAllList.map(item=>({cat_id:item.cat_id,     cat_name:item.cat_name}));
+            
+                    this.cateLeft = cateAllList.map(item=>({cat_id:item.cat_id,cat_name:item.cat_name}));
                     this.cateRight = [];
-                    setTimeout(()=>{this.cateRight = cateAllList[index].children},0);
+                    setTimeout(()=>{this.cateRight = cateAllList[index].children} ,0);
 
               }else{
                   this.renderContentPage(index);

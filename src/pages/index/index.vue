@@ -38,7 +38,8 @@
       </navigator>
     </view>
     <!-- 时尚女装 -->
-    <view class="adv" v-for="(item,index) in floorList" :key="item.name">
+    <view class="adv" v-for="(item,index) in floorList" :key="index">
+      <!-- 标题图片 -->
       <view class="adv-title">
         <image mode="widthFix" :src="item.floor_title.image_src" />
       </view>
@@ -48,9 +49,10 @@
             class="left-nav"
             :open-type="item.product_list[0].open_type"
             :url="item.product_list[0].navigator_url"
-            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
+            @tap="handleTapOnFloor(item.product_list[0].navigator_url)"
           >
             <image
+              @tap="handler(item.product_list[0].navigator_url)"
               mode="heightFix"
               class="left-img"
               :src="item.product_list[0].image_src"
@@ -63,7 +65,7 @@
             class="adv-nav"
             :open-type="item.product_list[1].open_type"
             :url="item.product_list[1].navigator_url"
-            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
+            @tap="handleTapOnFloor(item.product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[1].image_src" />
           </navigator>
@@ -71,7 +73,7 @@
             class="adv-nav"
             :open-type="item.product_list[2].open_type"
             :url="item.product_list[2].navigator_url"
-            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
+            @tap="handleTapOnFloor(item.product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[2].image_src" />
           </navigator>
@@ -79,7 +81,7 @@
             class="adv-nav"
             :open-type="item.product_list[3].open_type"
             :url="item.product_list[3].navigator_url"
-            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
+            @tap="handleTapOnFloor(item.product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[3].image_src" />
           </navigator>
@@ -87,7 +89,7 @@
             class="adv-nav"
             :open-type="item.product_list[4].open_type"
             :url="item.product_list[4].navigator_url"
-            @tap="handleTapOnFloor(floorList[index].product_list[0].navigator_url)"
+            @tap="handleTapOnFloor(item.product_list[0].navigator_url)"
           >
             <image class="right-img" :src="item.product_list[4].image_src" />
           </navigator>
@@ -123,6 +125,9 @@ export default {
     this.renderFloor();
   },
   methods: {
+    handler(val) {
+      console.log(val);
+    },
     //轮播图
     renderCarousel() {
       uni.request({
