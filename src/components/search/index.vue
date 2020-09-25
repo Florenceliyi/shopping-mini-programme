@@ -1,11 +1,25 @@
 <template>
   <view class="header-input">
-    <input class="weui-input" maxlength="15" bindinput="bindKeyInput" placeholder="搜索" />
+    <input
+      class="weui-input"
+      maxlength="15"
+      bindinput="bindKeyInput"
+      placeholder="搜索"
+      @tap="tapOnSearch"
+    />
   </view>
 </template>
 
 <script>
-export default {};
+export default {
+  methods: {
+    tapOnSearch() {
+      uni.navigateTo({
+        url: "/pages/search/index",
+      });
+    },
+  },
+};
 </script>
 
 <style lang='scss'>

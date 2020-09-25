@@ -15,18 +15,8 @@
       </view>
       <!-- 列表 -->
       <scroll-view scroll-y class="list" @scrolltolower="pullDownToBottom" scroll-with-animation>
-        <view
-          class="gl-content"
-          v-for="item in productList"
-          :key="item.goods_id"
-          @tap="jumpToGoodsDetail(item.goods_id)"
-        >
-          <image :src="item.goods_small_logo || '/static/product_low.png'" />
-          <view class="gl-right">
-            <view class="gl-title">{{item.goods_name}}</view>
-            <view class="gl-price">{{item.goods_price}}</view>
-          </view>
-        </view>
+        <!-- 子组件goods -->
+        <goods :productList="productList"></goods>
         <uni-load-more v-if="isShow" :status="isBottom ? 'loading' : 'noMore'"></uni-load-more>
       </scroll-view>
     </view>
@@ -35,10 +25,12 @@
 
 <script>
 import search from "@/components/search/index.vue";
+import goods from "@/components/goods/goods.vue";
 import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue";
 export default {
   components: {
     search,
+    goods,
     uniLoadMore,
   },
   data() {
@@ -105,12 +97,6 @@ export default {
 
       this.renderPage({ ...this.pageData });
     },
-    //跳转商品详情页
-    jumpToGoodsDetail(url) {
-      uni.navigateTo({
-        url: "/pages/goods_detail/index?goods_id=" + url,
-      });
-    },
   },
 };
 </script>
@@ -140,35 +126,6 @@ export default {
   /*列表栏*/
   .list {
     height: calc(100vh - 188rpx);
-    .gl-content {
-      width: 698rpx;
-      height: 209rpx;
-      display: flex;
-      padding: 26rpx 0 9rpx 15rpx;
-      image {
-        width: 191rpx;
-        height: 191rpx;
-      }
-      .gl-right {
-        width: 463rpx;
-        height: 100%;
-        margin-left: 30rpx;
-        font-size: 24rpx;
-        .gl-title {
-          width: 100%;
-          font-family: PingFangSC-Regular;
-          letter-spacing: 0;
-        }
-        .gl-price {
-          color: #ea4350;
-          margin-top: 60rpx;
-          &::before {
-            content: "￥";
-            font-size: 20rpx;
-          }
-        }
-      }
-    }
   }
 }
 </style>

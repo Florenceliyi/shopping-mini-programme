@@ -15,7 +15,12 @@ export default {
 <style lang='less'>
 /*每个页面公共css */
 @import "@/static/styles/iconfont.wxss";
+
 body {
   box-sizing: border-box;
+}
+/*css3新增特性，可以自定义变量在全局中使用*/
+page {
+  --color: #ea4350;
 }
 </style>
