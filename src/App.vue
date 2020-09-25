@@ -12,8 +12,9 @@ export default {
 };
 </script>
 
-<style lang='scss'>
+<style lang='less'>
 /*每个页面公共css */
+@import "@/static/styles/iconfont.wxss";
 body {
   box-sizing: border-box;
 }

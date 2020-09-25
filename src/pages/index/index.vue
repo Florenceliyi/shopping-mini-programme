@@ -125,9 +125,6 @@ export default {
     this.renderFloor();
   },
   methods: {
-    handler(val) {
-      console.log(val);
-    },
     //轮播图
     renderCarousel() {
       uni.request({

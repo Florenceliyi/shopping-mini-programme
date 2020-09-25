@@ -21,7 +21,8 @@
 		{
 			"path": "pages/goods_list/index",
 			"style": {
-				"navigationBarTitleText": "商品列表"
+				"navigationBarTitleText": "商品列表",
+				"enablePullDownRefresh": true
 			}
 		},
 		{
@@ -57,7 +58,7 @@
 		{
 			"path": "pages/search/index",
 			"style": {
-				"navigationBarTitleText": "搜索"
+				"navigationBarTitleText": "搜索中心"
 			}
 		},
 		{
@@ -129,5 +130,6 @@
 		"navigationBarTitleText": "优购商城",
 		"navigationBarBackgroundColor": "#ea4350",
 		"backgroundColor": "#ea4350"
+
 	}
 }

@@ -15,14 +15,19 @@
       </view>
       <!-- 列表 -->
       <scroll-view scroll-y class="list" @scrolltolower="pullDownToBottom" scroll-with-animation>
-        <view class="gl-content" v-for="item in productList" :key="item.goods_id">
+        <view
+          class="gl-content"
+          v-for="item in productList"
+          :key="item.goods_id"
+          @tap="jumpToGoodsDetail(item.goods_id)"
+        >
           <image :src="item.goods_small_logo || '/static/product_low.png'" />
           <view class="gl-right">
             <view class="gl-title">{{item.goods_name}}</view>
             <view class="gl-price">{{item.goods_price}}</view>
           </view>
         </view>
-        <uni-load-more :status="isBottom ? 'loading' : 'noMore'"></uni-load-more>
+        <uni-load-more v-if="isShow" :status="isBottom ? 'loading' : 'noMore'"></uni-load-more>
       </scroll-view>
     </view>
   </view>
@@ -49,6 +54,8 @@ export default {
       },
       //需要下拉刷新的标识;
       isBottom: false,
+      //下拉框是否显示
+      isShow: false,
     };
   },
   onLoad(options) {
@@ -58,23 +65,24 @@ export default {
     renderPage(options) {
       this.pageData.cid = options.cid;
       const data = { ...options };
-      console.log("data的数据");
-      console.dir(data);
       uni.request({
         url: "https://api-hmugo-web.itheima.net/api/public/v1/goods/search",
         data,
         success: (res) => {
           //合并之前请求好的页面和新的页面
           this.productList = [...this.productList, ...res.data.message.goods];
-
+          //顶部加载框显示；
+          this.isShow = true;
+          //加载完数据显示没有数据可加载
           if (res.data.message.goods.length === 0) {
             this.isBottom = false;
           }
-          console.log(res.data.message.goods);
-          console.log(this.productList);
+          //头部下拉刷新框停止刷新;
+          uni.stopPullDownRefresh();
         },
       });
     },
+    //tab栏切换
     handleTabClick(index) {
       //当前点击的tab栏索引
       this.currentIndex = index;
@@ -86,6 +94,22 @@ export default {
         this.pageData.pagenum++;
         this.renderPage({ ...this.pageData });
       }
+    },
+    //头部下拉刷新
+    onPullDownRefresh() {
+      console.log("头部下拉刷新");
+      //清空列表数组
+      this.productList = [];
+      this.pageData.pagenum = 1;
+      console.log(this.pageData);
+
+      this.renderPage({ ...this.pageData });
+    },
+    //跳转商品详情页
+    jumpToGoodsDetail(url) {
+      uni.navigateTo({
+        url: "/pages/goods_detail/index?goods_id=" + url,
+      });
     },
   },
 };
