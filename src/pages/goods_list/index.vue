@@ -16,7 +16,7 @@
       <!-- 列表 -->
       <scroll-view scroll-y class="list" @scrolltolower="pullDownToBottom" scroll-with-animation>
         <!-- 子组件goods -->
-        <goods :productList="productList"></goods>
+        <goods :item="item" v-for="item in productList" :key="item.goods_id"></goods>
         <uni-load-more v-if="isShow" :status="isBottom ? 'loading' : 'noMore'"></uni-load-more>
       </scroll-view>
     </view>

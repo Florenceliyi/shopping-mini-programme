@@ -43,7 +43,7 @@
       :fill="true"
       :options="options"
       :buttonGroup="buttonGroup"
-      @click="onClick"
+      @click="tapOnShoppingCart"
       @buttonClick="addShoppingCart"
     />
   </view>
@@ -177,12 +177,14 @@ export default {
         data: isCollection,
       });
     },
-    onClick(e) {
-      uni.showToast({
-        title: `点击${e.content.text}`,
-        icon: "none",
+    tapOnShoppingCart(e) {
+      //tabbar栏跳转需要用switchTab
+      uni.switchTab({
+        url: "/pages/cart/index",
       });
+      console.log(e);
     },
+    //点击加入购物车
     addShoppingCart(e) {
       console.log(e);
       uni.showToast({
@@ -213,6 +215,7 @@ export default {
             goods_price,
             goods_number,
             goods_small_logo,
+            goods_name,
           } = this.goodsDes;
           cartList.push({
             goods_id,
@@ -220,6 +223,7 @@ export default {
             goods_price,
             goods_number,
             goods_small_logo,
+            goods_name,
             goods_count: goods_num,
             isSelected: true,
           });
@@ -234,6 +238,7 @@ export default {
           goods_price,
           goods_number,
           goods_small_logo,
+          goods_name,
         } = this.goodsDes;
         cartList.push({
           goods_id,
@@ -241,6 +246,7 @@ export default {
           goods_price,
           goods_number,
           goods_small_logo,
+          goods_name,
           goods_count: goods_num,
           isSelected: true,
         });

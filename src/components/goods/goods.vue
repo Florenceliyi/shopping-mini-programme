@@ -1,11 +1,6 @@
 <template>
   <block>
-    <view
-      class="gl-content"
-      v-for="item in productList"
-      :key="item.goods_id"
-      @tap="jumpToGoodsDetail(item.goods_id)"
-    >
+    <view class="gl-content" @tap="jumpToGoodsDetail(item.goods_id)">
       <image :src="item.goods_small_logo || '/static/product_low.png'" />
       <view class="gl-right">
         <view class="gl-title">{{item.goods_name}}</view>
@@ -17,10 +12,16 @@
 
 <script>
 export default {
+  props: {
+    item: {
+      type: Object,
+      default: {},
+    },
+  },
   data() {
     return {};
   },
-  props: ["productList"],
+  mounted() {},
   methods: {
     //跳转商品详情页
     jumpToGoodsDetail(url) {
