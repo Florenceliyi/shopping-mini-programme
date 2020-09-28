@@ -1,7 +1,11 @@
 <template>
   <view class="cart-container">
-    <scroll-view class="cartList">
-      <view class="cartItem" v-for="(item,index) in cartList" :key="item.goods_id">
+    <scroll-view class="cartList" v-if="cartList.length >= 0">
+      <view
+        class="cartItem"
+        v-for="(item, index) in cartList"
+        :key="item.goods_id"
+      >
         <radio
           color="var(--color)"
           @tap="tapOnRadio(item.goods_id)"
@@ -12,26 +16,47 @@
         <goods class="cart-content" :item="item"></goods>
         <!-- 加减购物车 -->
         <view class="icons">
-          <i class="iconfont icon-tianjia:before" @tap="addNum(item.goods_id)"></i>
+          <i
+            class="iconfont icon-tianjia:before"
+            :class="isClick == index ? 'active' : ''"
+            @tap="addNum(item.goods_id, index)"
+          ></i>
           <input
             type="text"
             v-model="item.goods_count"
-            @focus="changeInputStyle"
-            :class="isInputFocus? 'active':''"
+            @focus="changeInputStyle(index)"
+            @blur="inputOnBlur(index, $event)"
+            :class="currentInput == index ? 'active' : ''"
           />
-          <i class="iconfont .icon-jianshao:before" @tap="subNum(item.goods_id)"></i>
+          <i
+            class="iconfont .icon-jianshao:before"
+            :class="isClick == index ? 'active' : ''"
+            @tap="subNum(item.goods_id, index)"
+          ></i>
         </view>
       </view>
       <!-- 购物车没有商品 -->
-      <view class="no-goods" v-if="cartList.length == 0">购物车没有商品，快去选购吧~ヽ(✿ﾟ▽ﾟ)ノ</view>
+      <view class="no-goods" v-if="cartList.length == 0"
+        >购物车没有商品，快去选购吧~ヽ(✿ﾟ▽ﾟ)ノ</view
+      >
     </scroll-view>
     <!-- 结算 -->
-    <view class="charge">
-      <radio color="var(--color)" :checked="isAllSelected"></radio>
+    <view class="charge" v-if="cartList.length > 0">
+      <radio
+        color="var(--color)"
+        :checked="isAllSelected"
+        @tap="tapOnAllSelected"
+        :disable="cartList.length == 0 ? false : true"
+      ></radio>
       <view class="selectAll">全选</view>
       <view class="totalPrice">合计：</view>
-      <view class="number">{{calAllGoods}}</view>
-      <button>去结算({{cartList.length}})</button>
+      <view class="number">{{ calAllGoods }}</view>
+      <button
+        :class="cartList.length == 0 ? 'no-cart payment' : 'payment'"
+        @tap="payAllGoods"
+      >
+        去结算({{ cartList.length }})
+      </button>
     </view>
   </view>
 </template>
@@ -44,23 +69,22 @@ export default {
   },
   data() {
     return {
-      cartList: [],
+      cartList: [1],
       //单选框
       checked: false,
       //是否全选
       isAllSelected: false,
-      //总价格
-      total: 0,
       //input是否聚焦
-      isInputFocus: false,
+      currentInput: null,
+      //加，减号是否被点击
+      isClick: null,
     };
   },
   watch: {
     cartList: {
       handler(val) {
-        console.log("--watch");
         console.log(val);
-        this.total = this.calAllGoods;
+        uni.setStorageSync("cartList", val);
       },
       deep: true,
     },
@@ -68,12 +92,14 @@ export default {
   computed: {
     calAllGoods() {
       let totalPrice = 0;
-      this.cartList.map((item) => {
-        if (item.isSelected) {
-          totalPrice += item.goods_count * item.goods_price;
-        }
-      });
-      return totalPrice;
+      if (this.cartList.length > 0) {
+        this.cartList.map((item) => {
+          if (item.isSelected) {
+            totalPrice += item.goods_count * item.goods_price;
+          }
+        });
+        return totalPrice;
+      }
     },
   },
   onShow() {
@@ -91,14 +117,15 @@ export default {
         }
         return item;
       });
-      uni.setStorageSync("cartList", this.cartList);
+      //   uni.setStorageSync("cartList", this.cartList);
       //是否全选
       this.calIsAllSelected();
     },
     //点击加号
-    addNum(id) {
+    addNum(id, index) {
+      this.isClick = index;
       this.cartList = this.cartList.map((item) => {
-        if (item.goods_id == id) {
+        if (item.goods_id == id && item.goods_count < 200) {
           item.goods_count++;
           uni.showLoading({
             title: "加载中...",
@@ -108,10 +135,18 @@ export default {
         }
         return item;
       });
-      uni.setStorageSync("cartList", this.cartList);
+      //   uni.setStorageSync("cartList", this.cartList);
     },
     //点击减号
-    subNum(id) {
+    subNum(id, index) {
+      //当前点击项变红
+      this.isClick = index;
+
+      uni.showLoading({
+        title: "加载中...",
+        mask: true,
+        duration: 300,
+      });
       this.cartList = this.cartList.map((item, index) => {
         if (item.goods_id == id) {
           if (item.goods_count <= 1) {
@@ -123,7 +158,7 @@ export default {
                   console.log(index);
                   this.cartList.splice(index, 1);
                   /*******异步回调，这里需要先缓存到本地，不然下面已经存到本地了，再执行这一步；********/
-                  uni.setStorageSync("cartList", this.cartList);
+                  //   uni.setStorageSync("cartList", this.cartList);
                 }
               },
             });
@@ -133,15 +168,62 @@ export default {
         }
         return item;
       });
-      uni.setStorageSync("cartList", this.cartList);
+      //   uni.setStorageSync("cartList", this.cartList);
     },
-    //计算总价
+    //计算是否全选
     calIsAllSelected() {
-      this.isAllSelected = this.cartList.every((v) => v.isSelected);
+      if (this.cartList.length > 0) {
+        /******every的特性是如果是空数组执行会直接返回true，会导致购物车商品全删除的时候全选的值还是为true*******/
+        this.isAllSelected = this.cartList.every((v) => v.isSelected);
+      }
     },
     //获取焦点修改input样式
-    changeInputStyle() {
-      this.isInputFocus = true;
+    changeInputStyle(index) {
+      this.currentInput = index;
+    },
+    //失去焦点
+    inputOnBlur(index, e) {
+      //修改样式标识为空；
+      this.currentInput = null;
+      if (e.target.value >= 200 || e.target.value < 1) {
+        uni.showToast({
+          title: "不可超过200件~",
+          duration: 2000,
+        });
+        e.target.value = 200;
+        console.log(e.target.value);
+      }
+      console.log(e.target.value);
+      this.cartList[index].goods_count = parseInt(e.target.value);
+    },
+    //点击全选
+    tapOnAllSelected() {
+      //点击全选取反
+      this.isAllSelected = !this.isAllSelected;
+      //取反状态反映到各个按钮；
+      if (this.cartList.length > 0) {
+        this.cartList.forEach((v) => (v.isSelected = this.isAllSelected));
+      }
+    },
+    //点击结算按钮
+    payAllGoods() {
+      //先判断购物车是否为空
+      if (this.cartList.length == 0) {
+        uni.showToast({
+          title: "先去选购商品哦~",
+          duration: 500,
+        });
+        return;
+      } else if (!this.cartList.every((v) => v.isSelected == true)) {
+        uni.showToast({
+          title: "点击选择商品哦~",
+          duration: 1000,
+        });
+        return;
+      }
+      uni.navigateTo({
+        url: "/pages/pay/index",
+      });
     },
   },
 };
@@ -150,9 +232,6 @@ export default {
 <style lang='less'>
 .cart-container {
   padding: 15rpx 15rpx 83rpx 20rpx;
-  .cartList {
-    height: cal(100vh - 83rpx);
-  }
   .cartItem {
     width: 100%;
     height: 210rpx;
@@ -179,20 +258,21 @@ export default {
     font-weight: 800;
     text-align: center;
   }
+  /*加、减号tubiao*/
   .icons {
     position: absolute;
     display: flex;
     right: 20rpx;
     bottom: 10rpx;
     input {
-      width: 40rpx;
+      width: 70rpx;
       text-align: center;
       margin: 0 15rpx;
       font-family: PingFangSC-Regular;
       color: #333;
       font-size: 30rpx;
       &.active {
-        border: 1px solid #666;
+        border: 1px solid var(--color);
       }
     }
     i {
@@ -200,6 +280,14 @@ export default {
       &:first-child {
         transform: scale(1.2);
         vertical-align: bottom;
+        &.active {
+          color: var(--color);
+        }
+      }
+      &:last-child {
+        &.active {
+          color: var(--color);
+        }
       }
     }
   }
@@ -238,7 +326,7 @@ export default {
         font-size: 20rpx;
       }
     }
-    button {
+    .payment {
       width: 20%;
       font-size: 21rpx;
       font-family: PingFangSC-Regular;
@@ -247,6 +335,10 @@ export default {
       background: #ea4350;
       padding: 0;
       margin-left: 23%;
+      &.no-cart {
+        background: #b6b6b6;
+        color: #fefefe;
+      }
     }
   }
 }

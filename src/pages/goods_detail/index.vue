@@ -130,8 +130,14 @@ export default {
           //加载本地数据
           const cartList = uni.getStorageSync("cartList");
           console.log(cartList);
-          if (cartList) {
-            this.options[2].info = cartList.length;
+          if (cartList.length > 0) {
+            let sum = 0;
+            let res = cartList.map((v) => {
+              sum += v.goods_count;
+              return sum;
+            });
+            //总数设置给购物车数量标识
+            this.options[2].info = sum;
           }
         });
     },
@@ -207,7 +213,9 @@ export default {
         } else {
           //在本地没找到
           this.options[2].info++;
-          const goods_num = this.options[2].info;
+          let goods_num = 0;
+          //当前商品数量+1
+          goods_num++;
           //点击购物车按钮，数量加1；
           const {
             goods_id,
@@ -230,8 +238,9 @@ export default {
         }
       } else {
         this.options[2].info++;
-        const goods_num = this.options[2].info;
+        let goods_num = 0;
         //点击购物车按钮，数量加1；
+        goods_num++;
         const {
           goods_id,
           cat_id,
@@ -240,6 +249,7 @@ export default {
           goods_small_logo,
           goods_name,
         } = this.goodsDes;
+
         cartList.push({
           goods_id,
           cat_id,

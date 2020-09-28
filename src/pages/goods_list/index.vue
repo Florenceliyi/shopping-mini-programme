@@ -7,17 +7,30 @@
       <view class="tab">
         <view
           class="tab-item"
-          v-for="(item,index) in tabList"
+          v-for="(item, index) in tabList"
           :key="index"
-          :class="currentIndex == index? 'active': '' "
+          :class="currentIndex == index ? 'active' : ''"
           @tap="handleTabClick(index)"
-        >{{item}}</view>
+          >{{ item }}</view
+        >
       </view>
       <!-- 列表 -->
-      <scroll-view scroll-y class="list" @scrolltolower="pullDownToBottom" scroll-with-animation>
+      <scroll-view
+        scroll-y
+        class="list"
+        @scrolltolower="pullDownToBottom"
+        scroll-with-animation
+      >
         <!-- 子组件goods -->
-        <goods :item="item" v-for="item in productList" :key="item.goods_id"></goods>
-        <uni-load-more v-if="isShow" :status="isBottom ? 'loading' : 'noMore'"></uni-load-more>
+        <goods
+          :item="item"
+          v-for="item in productList"
+          :key="item.goods_id"
+        ></goods>
+        <uni-load-more
+          v-if="isShow"
+          :status="isBottom ? 'loading' : 'noMore'"
+        ></uni-load-more>
       </scroll-view>
     </view>
   </view>
@@ -54,25 +67,24 @@ export default {
     this.renderPage(options);
   },
   methods: {
-    renderPage(options) {
+    async renderPage(options) {
       this.pageData.cid = options.cid;
       const data = { ...options };
-      uni.request({
-        url: "https://api-hmugo-web.itheima.net/api/public/v1/goods/search",
+      const res = await this.$request({
+        url: "/goods/search",
         data,
-        success: (res) => {
-          //合并之前请求好的页面和新的页面
-          this.productList = [...this.productList, ...res.data.message.goods];
-          //顶部加载框显示；
-          this.isShow = true;
-          //加载完数据显示没有数据可加载
-          if (res.data.message.goods.length === 0) {
-            this.isBottom = false;
-          }
-          //头部下拉刷新框停止刷新;
-          uni.stopPullDownRefresh();
-        },
       });
+
+      //合并之前请求好的页面和新的页面
+      this.productList = [...this.productList, ...res.goods];
+      //顶部加载框显示；
+      this.isShow = true;
+      //加载完数据显示没有数据可加载
+      if (res.goods.length === 0) {
+        this.isBottom = false;
+      }
+      //头部下拉刷新框停止刷新;
+      uni.stopPullDownRefresh();
     },
     //tab栏切换
     handleTabClick(index) {

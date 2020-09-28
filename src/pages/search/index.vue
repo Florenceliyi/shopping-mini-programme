@@ -30,13 +30,12 @@ export default {
   },
   methods: {
     tapOnSearch() {},
-    renderSearchList() {
-      uni.request({
-        url: "https://api-hmugo-web.itheima.net/api/public/v1/goods/detail",
-        success: (res) => {
-          console.log(res);
-        },
+    async renderSearchList() {
+      const res = await this.$request({
+        url: "/goods/detail",
       });
+      console.log("搜索返回的数据");
+      console.log(res);
     },
   },
 };

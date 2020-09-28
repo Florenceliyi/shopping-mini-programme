@@ -13,7 +13,11 @@
         interval="3000"
         circular
       >
-        <swiper-item class="banner-img banner-items" v-for="item in carousel" :key="item.goods_id">
+        <swiper-item
+          class="banner-img banner-items"
+          v-for="item in carousel"
+          :key="item.goods_id"
+        >
           <navigator
             :open-type="item.open_type"
             :url="item.navigator_url"
@@ -38,7 +42,7 @@
       </navigator>
     </view>
     <!-- 时尚女装 -->
-    <view class="adv" v-for="(item,index) in floorList" :key="index">
+    <view class="adv" v-for="(item, index) in floorList" :key="index">
       <!-- 标题图片 -->
       <view class="adv-title">
         <image mode="widthFix" :src="item.floor_title.image_src" />
@@ -56,7 +60,7 @@
               mode="heightFix"
               class="left-img"
               :src="item.product_list[0].image_src"
-              :style="{width:item.product_list[0].image_width}"
+              :style="{ width: item.product_list[0].image_width }"
             />
           </navigator>
         </view>
@@ -126,32 +130,25 @@ export default {
   },
   methods: {
     //轮播图
-    renderCarousel() {
-      uni.request({
-        url: "https://api-hmugo-web.itheima.net/api/public/v1/home/swiperdata",
-        success: (res) => {
-          //   this.setData({carousel:res.data.message})
-          this.carousel = res.data.message;
-        },
+    async renderCarousel() {
+      const res = await this.$request({
+        url: "/home/swiperdata",
       });
+      this.carousel = res;
     },
     //分类
-    renderCategory() {
-      uni.request({
-        url: "https://api-hmugo-web.itheima.net/api/public/v1/home/catitems",
-        success: (res) => {
-          this.categoryList = res.data.message;
-        },
+    async renderCategory() {
+      const res = await this.$request({
+        url: "/home/catitems",
       });
+      this.categoryList = res;
     },
     //楼层
-    renderFloor() {
-      uni.request({
-        url: "https://api-hmugo-web.itheima.net/api/public/v1/home/floordata",
-        success: (res) => {
-          this.floorList = res.data.message;
-        },
+    async renderFloor() {
+      const res = await this.$request({
+        url: "/home/floordata",
       });
+      this.floorList = res;
     },
     //点击轮播图
     handleTapOnBanner(url) {

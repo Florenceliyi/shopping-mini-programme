@@ -40,7 +40,21 @@
 		{
 			"path": "pages/cart/index",
 			"style": {
-				"navigationBarTitleText": "购物车"
+				"navigationBarTitleText": "购物车",
+				"app-plus": {
+					"subNVues": [{
+						"id": "nav", // 唯一标识  
+						"path": "pages/cart/subnvue/nav", // 页面路径  
+						/*"type": "popup",  这里不需要*/
+						"style": {
+							"position": "absolute",
+							"dock": "right",
+							"width": "100upx",
+							"height": "150upx",
+							"background": "transparent"
+						}
+					}]
+				}
 			}
 		},
 		{
@@ -126,7 +140,7 @@
 	},
 
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
+		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "优购商城",
 		"navigationBarBackgroundColor": "#ea4350",
 		"backgroundColor": "#ea4350"
