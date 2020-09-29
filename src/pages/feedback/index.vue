@@ -6,29 +6,50 @@
       <view class="prom-cate">
         <view
           class="item"
-          v-for="(item,index) in problemList"
+          v-for="(item, index) in problemList"
           :key="item.id"
-          :class="currentIndex == index ? 'active':''"
+          :class="submitList.currentIndex == index ? 'active' : ''"
           @tap="tapOnProbTab(index)"
-        >{{item.des}}</view>
+          >{{ item.des }}</view
+        >
       </view>
     </view>
     <!-- 问题内容 -->
     <view class="content">
-      <textarea placeholder="请描述一下您的问题..."></textarea>
+      <textarea
+        placeholder="请描述一下您的问题..."
+        v-model="submitList.content"
+        @blur="textareaOnBlur"
+      ></textarea>
     </view>
     <!-- 上传图片 -->
     <view class="upload">
       <view class="upload-title">上传图片(0/4)</view>
-      <view class="pics-item" @tap="tapOnUpLoadFile">
-        <view class="upload-image">
+      <view class="pics-item">
+        <view class="upload-image" @tap="tapOnUpLoadFile">
           <i class="heng"></i>
           <i class="shu"></i>
         </view>
+
+        <view
+          class="photo-item"
+          @tap="tapOnPicItem(index)"
+          v-for="(item, index) in submitList.picList"
+          :key="index"
+        >
+          <image :src="item" />
+          <icon
+            type="clear"
+            size="18"
+            color="var(--color)"
+            @tap="delPic(index)"
+          />
+        </view>
       </view>
     </view>
+
     <!-- 提交按钮 -->
-    <button>提交</button>
+    <button @tap="submitProblem">提交</button>
   </view>
 </template>
 
@@ -54,43 +75,100 @@ export default {
           des: "其他",
         },
       ],
-      currentIndex: null,
+
+      submitList: {
+        currentIndex: null,
+        content: "",
+        picList: [],
+      },
     };
+  },
+  onLoad() {
+    //获取本地缓存数据
+    const submitPro = uni.getStorageSync("submitPro");
+    this.submitList.picList = submitPro.picList || [];
+    this.submitList.currentIndex = submitPro.currentIndex;
+    this.submitList.content = submitPro.content;
+  },
+  watch: {
+    submitList: {
+      handler: (val) => {
+        uni.setStorageSync("submitPro", val);
+      },
+      deep: true,
+    },
   },
   methods: {
     //上传图片文件
     tapOnUpLoadFile() {
       // 从相册选择6张图
       uni.chooseImage({
-        count: 6,
-        sizeType: ["original", "compressed"],
+        count: 5,
+        sizeType: ["compressed"],
         sourceType: ["album"],
-        success: function (res) {
-          // 预览图片
-          uni.previewImage({
-            urls: res.tempFilePaths,
-            longPressActions: {
-              itemList: ["发送给朋友", "保存图片", "收藏"],
-              success: function (data) {
-                console.log(
-                  "选中了第" +
-                    (data.tapIndex + 1) +
-                    "个按钮,第" +
-                    (data.index + 1) +
-                    "张图片"
-                );
-              },
-              fail: function (err) {
-                console.log(err.errMsg);
-              },
-            },
+        success: (res) => {
+          console.log(res);
+          if (
+            res.tempFilePaths.length + this.submitList.picList <= 4 &&
+            this.submitList.picList <= 4
+          ) {
+            this.submitList.picList = res.tempFilePaths;
+            return;
+          }
+
+          uni.showToast({
+            title: "图片不能超4张哦~",
+            duration: 2000,
           });
         },
       });
     },
+    //点击图片
+    tapOnPicItem(index) {
+      uni.previewImage({
+        urls: this.submitList.picList[index],
+        longPressActions: {
+          itemList: ["发送给朋友", "保存图片", "收藏"],
+          success: function (data) {
+            console.log(
+              "选中了第" +
+                (data.tapIndex + 1) +
+                "个按钮,第" +
+                (data.index + 1) +
+                "张图片"
+            );
+          },
+          fail: function (err) {
+            console.log(err.errMsg);
+          },
+        },
+      });
+    },
+    //删除图片
+    delPic(index) {
+      this.submitList.picList.splice(index, 1);
+    },
+
     //点击问题选项
     tapOnProbTab(index) {
-      this.currentIndex = index;
+      this.submitList.currentIndex = index;
+    },
+    //失去焦点
+    textareaOnBlur() {},
+    //提交问题
+    submitProblem() {
+      //清除图片本地缓存
+      uni.removeStorageSync("imgList");
+      this.submitList.content = this.submitList.content.trim();
+      //存入新的总数据本地缓存
+      uni.setStorageSync("submitPro", this.submitList);
+      uni.showToast({
+        title: "提交成功",
+        duration: 2000,
+      });
+      this.submitList.currentIndex = null;
+      this.submitList.content = "";
+      this.submitList.picList = [];
     },
   },
 };
@@ -146,7 +224,7 @@ export default {
       padding: 25rpx 0 0 25rpx;
       box-sizing: border-box;
       font-size: 26rpx;
-      color: #ccc;
+      color: #666;
     }
   }
   /*上传图片*/
@@ -164,6 +242,7 @@ export default {
     }
     .pics-item {
       display: flex;
+      flex-wrap: wrap;
       .upload-image {
         position: relative;
         width: 128rpx;
@@ -184,6 +263,22 @@ export default {
         .shu {
           width: 6rpx;
           height: 74rpx;
+        }
+      }
+      .photo-item {
+        width: 128rpx;
+        height: 128rpx;
+        margin-left: 10rpx;
+        position: relative;
+        image {
+          width: 100%;
+          height: 100%;
+        }
+        icon {
+          position: absolute;
+          right: -8rpx;
+          top: -11rpx;
+          z-index: 999;
         }
       }
     }
