@@ -8,6 +8,7 @@
           >{{ userInfo.name }} {{ userInfo.phone }}</text
         >
       </block>
+      <!-- 无地址时 -->
       <button
         class="selectAddress"
         v-if="userInfo.name == undefined || userInfo.name == ''"
@@ -81,7 +82,6 @@ export default {
   methods: {
     //支付按钮
     async payAllGoods() {
-      //进来前的一些操作，判断用户有否授权，选择地址
       //1.获取发请求前的所有参数;
       const token = uni.getStorageSync("tokenKey");
       const userInfo = uni.getStorageSync("userInfo");
@@ -180,13 +180,11 @@ export default {
         });
         return;
       }
-      console.log(userInfo);
-      console.log("用户授权");
-      console.log(e);
 
       //先判断是否有授权,有过授权可以从本地拿到token值；
       const hasToken = uni.getStorageSync("tokenKey");
       if (hasToken) {
+        this.payAllGoods();
       } else {
         //判断用户是否愿意授权
         const res = await uni.showModal({
@@ -268,29 +266,6 @@ export default {
     async getUserCode() {
       const res = await uni.login();
       return res;
-    },
-    //用户授权请求
-    getUserAuth() {
-      wx.getSetting({
-        withSubscriptions: true,
-        success(res) {
-          console.log(res);
-          // res.authSetting = {
-          //   "scope.userInfo": true,
-          //   "scope.userLocation": true
-          // }
-
-          // res.subscriptionsSetting = {
-          //   mainSwitch: true, // 订阅消息总开关
-          //   itemSettings: {   // 每一项开关
-          //     SYS_MSG_TYPE_INTERACTIVE: 'accept', // 小游戏系统订阅消息
-          //     SYS_MSG_TYPE_RANK: 'accept'
-          //     zun-LzcQyW-edafCVvzPkK4de2Rllr1fFpw2A_x0oXE: 'reject', // 普通一次性订阅消息
-          //     ke_OZC_66gZxALLcsuI7ilCJSP2OJ2vWo2ooUPpkWrw: 'ban',
-          //   }
-          // }
-        },
-      });
     },
   },
 };

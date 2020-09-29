@@ -69,6 +69,7 @@ export default {
     } else if (options.currentIndex == 3) {
       this.currentIndex = 0;
     }
+    this.getHistoryOrder();
   },
   onShow() {
     this.getHistoryOrder();

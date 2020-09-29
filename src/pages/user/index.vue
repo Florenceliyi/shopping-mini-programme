@@ -7,7 +7,17 @@
         <image class="inside" :src="userInfo.avatarUrl" />
         <view class="name">{{ userInfo.nickName }}</view>
       </view>
+      <!-- 还没登录时 -->
+      <button
+        class="login"
+        v-if="userInfo.nickName == undefined || userInfo.nickName == ''"
+        open-type="getUserInfo"
+        @getuserinfo="login"
+      >
+        登录
+      </button>
     </view>
+
     <view class="bottom">
       <!-- 图标按钮 -->
       <view class="content">
@@ -91,6 +101,13 @@ export default {
     //点击icons
     tapOnIcons(index) {
       this.currentIndex = index;
+      if (!this.userInfo.nickName) {
+        uni.showToast({
+          title: "先去登录哦~",
+          duration: 2000,
+        });
+        return;
+      }
       uni.navigateTo({
         url: "/pages/order/index?currentIndex=" + index,
       });
@@ -103,8 +120,76 @@ export default {
     },
     //跳转反馈页
     jumpToFeedbackPage() {
+      if (!this.userInfo.nickName) {
+        uni.showToast({
+          title: "先去登录哦~",
+          duration: 2000,
+        });
+        return;
+      }
       uni.navigateTo({
         url: "/pages/feedback/index",
+      });
+    },
+    //登录
+    async login(e) {
+      console.log(e);
+      //存储当前用户的微信信息;
+      const {
+        nickName,
+        gender,
+        province,
+        city,
+        country,
+        avatarUrl,
+      } = e.detail.userInfo;
+
+      //解构用户token值
+      const { rawData, signature, encryptedData, iv } = e.detail;
+      //获取code值
+      const res = await uni.login();
+      const code = res[1].code;
+
+      console.log(rawData, signature, encryptedData, iv, code);
+      //发送请求获取token
+      const backData = await this.$request({
+        url: "/users/wxlogin",
+        method: "POST",
+        data: { rawData, signature, encryptedData, iv, code },
+      });
+      console.log(backData);
+      if (backData == null) {
+        uni.showToast({
+          title: "网络飞走了~",
+          duration: 1000,
+        });
+        return;
+      }
+
+      uni.showToast({
+        title: "授权登录成功，加载中",
+        icon: "loading",
+        duration: 2000,
+      });
+
+      //渲染当前页面
+      this.userInfo = { nickName, avatarUrl };
+
+      //存入当前token
+      uni.setStorageSync("tokenKey", backData.token);
+
+      uni.setStorageSync("currentUser", {
+        nickName,
+        gender,
+        province,
+        city,
+        country,
+        avatarUrl,
+      });
+      //提示用户
+      uni.showToast({
+        title: "登录成功",
+        duration: 2000,
       });
     },
   },
@@ -144,6 +229,17 @@ export default {
         text-align: center;
         color: #fff;
       }
+    }
+    /*登录按钮*/
+    .login {
+      width: 200rpx;
+      border: 2px solid #ea4350;
+      border-radius: 44.5px;
+      font-size: 30rpx;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
   }
   .bottom {

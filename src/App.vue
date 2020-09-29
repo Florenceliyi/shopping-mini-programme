@@ -15,7 +15,10 @@ export default {
 <style lang='less'>
 /*每个页面公共css */
 @import "@/static/styles/iconfont.wxss";
-
+button {
+  padding: 0;
+  margin: 0;
+}
 body {
   box-sizing: border-box;
 }
